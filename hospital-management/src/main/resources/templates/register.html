@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - PulseCare HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F1F5F6; --surface: #FFFFFF; --primary: #0D7377; --primary-dark: #0A5A5D;
+    --primary-light: #E0F2F1; --accent: #FF8C61; --text: #1E2A32; --text-muted: #64748B; --border: #E2E8EC;
+  }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; }
+  .navbar-custom { background-color: var(--surface); border-bottom: 1px solid var(--border); }
+  .brand { font-weight: 700; color: var(--primary-dark); letter-spacing: .5px; }
+  .brand .pulse-dot { color: var(--accent); }
+  .btn-brand { background-color: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .btn-brand:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+  .btn-outline-brand { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+  .btn-outline-brand:hover { background-color: var(--primary); color: #fff; }
+  .auth-wrap { padding: 50px 0; }
+  .card-custom {
+    border: none; border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(13,115,119,0.07);
+    background-color: var(--surface);
+  }
+  .form-label { font-weight: 500; font-size: .9rem; }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 .2rem rgba(13,115,119,0.15);
+  }
+  .role-tabs .btn { border-radius: 8px; font-weight: 600; }
+  .role-tabs input[type="radio"] { display: none; }
+  .role-tabs label {
+    border: 1px solid var(--border); border-radius: 8px; padding: .55rem .5rem;
+    width: 100%; text-align: center; cursor: pointer; color: var(--text-muted); font-weight: 600;
+    transition: all .15s ease;
+  }
+  .role-tabs input[type="radio"]:checked + label {
+    background-color: var(--primary); color: #fff; border-color: var(--primary);
+  }
+  .role-fields { display: none; }
+  .role-fields.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom py-3">
+  <div class="container">
+    <a class="navbar-brand brand" th:href="@{/}"><i class="bi bi-heart-pulse-fill pulse-dot"></i> PulseCare <span class="pulse-dot">HMS</span></a>
+    <div class="d-flex gap-2">
+      <a th:href="@{/login}" class="btn btn-outline-brand btn-sm">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container auth-wrap">
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+      <div class="card-custom p-4 p-md-5">
+        <div class="text-center mb-4">
+          <h3>Create your account</h3>
+          <p class="text-muted mb-0">Pick your role first — the form will adjust to what we need from you.</p>
+        </div>
+
+        <!-- Server-side validation message -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="@{/register}" method="post" id="registerForm">
+
+          <!-- Role selector -->
+          <label class="form-label">I am registering as</label>
+          <div class="row role-tabs g-2 mb-4">
+            <div class="col-4">
+              <input type="radio" name="role" id="roleStudent" value="PATIENT" checked>
+              <label for="roleStudent"><i class="bi bi-person-fill d-block fs-5 mb-1"></i>Patient</label>
+            </div>
+            <div class="col-4">
+              <input type="radio" name="role" id="roleDoctor" value="DOCTOR">
+              <label for="roleDoctor"><i class="bi bi-clipboard2-pulse-fill d-block fs-5 mb-1"></i>Doctor</label>
+            </div>
+            <div class="col-4">
+              <input type="radio" name="role" id="roleReceptionist" value="RECEPTIONIST">
+              <label for="roleReceptionist"><i class="bi bi-person-badge-fill d-block fs-5 mb-1"></i>Receptionist</label>
+            </div>
+          </div>
+
+          <!-- Common fields -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" name="fullName" placeholder="Enter your name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" name="email" placeholder="Enter your mail" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" name="phone" placeholder="xxxxxxxxxx" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" class="form-control" name="dob">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-control" name="password" placeholder="At least 6 characters" required minlength="6">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" name="confirmPassword" placeholder="Re-enter password" required minlength="6">
+            </div>
+          </div>
+
+          <!-- Patient-only fields -->
+          <div class="role-fields active" id="fields-PATIENT">
+            <hr class="my-4">
+            <h6 class="text-muted mb-3">Patient details</h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender">
+                  <option value="">Select</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Blood Group</label>
+                <select class="form-select" name="bloodGroup">
+                  <option value="">Select</option>
+                  <option>A+</option><option>A-</option>
+                  <option>B+</option><option>B-</option>
+                  <option>O+</option><option>O-</option>
+                  <option>AB+</option><option>AB-</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Emergency Contact</label>
+                <input type="tel" class="form-control" name="emergencyContact" placeholder="Optional">
+              </div>
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <textarea class="form-control" name="address" rows="2" placeholder="House no., street, city, state"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctor-only fields -->
+          <div class="role-fields" id="fields-DOCTOR">
+            <hr class="my-4">
+            <h6 class="text-muted mb-3">Doctor details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Specialization</label>
+                <select class="form-select" name="specialization">
+                  <option value="">Select</option>
+                  <option>General Medicine</option>
+                  <option>Cardiology</option>
+                  <option>Dermatology</option>
+                  <option>Pediatrics</option>
+                  <option>Orthopedics</option>
+                  <option>ENT</option>
+                  <option>Neurology</option>
+                  <option>Gynecology</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Qualification</label>
+                <input type="text" class="form-control" name="qualification" placeholder="e.g. MBBS, MD">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Experience (years)</label>
+                <input type="number" class="form-control" name="experience" min="0" placeholder="e.g. 5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">License / Registration No.</label>
+                <input type="text" class="form-control" name="licenseNumber" placeholder="Medical council reg. no.">
+              </div>
+            </div>
+          </div>
+
+          <!-- Receptionist-only fields -->
+          <div class="role-fields" id="fields-RECEPTIONIST">
+            <hr class="my-4">
+            <h6 class="text-muted mb-3">Staff details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Employee ID</label>
+                <input type="text" class="form-control" name="employeeId" placeholder="e.g. EMP-1023">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Department / Desk</label>
+                <input type="text" class="form-control" name="department" placeholder="e.g. Front Desk - OPD">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Shift</label>
+                <select class="form-select" name="shift">
+                  <option value="">Select</option>
+                  <option>Morning</option>
+                  <option>Evening</option>
+                  <option>Night</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="terms" required>
+            <label class="form-check-label small text-muted" for="terms">
+              I agree to the terms of use and consent to my data being used for appointment and care management.
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-brand w-100 mt-4 py-2">Create Account</button>
+        </form>
+
+        <p class="text-center text-muted mt-4 mb-0">
+          Already have an account? <a th:href="@{/login}" class="text-decoration-none" style="color:var(--primary); font-weight:600;">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const roleInputs = document.querySelectorAll('input[name="role"]');
+  const roleFields = document.querySelectorAll('.role-fields');
+
+  function updateFields() {
+    const selected = document.querySelector('input[name="role"]:checked').value;
+    roleFields.forEach(div => {
+      div.classList.toggle('active', div.id === 'fields-' + selected);
+    });
+  }
+
+  roleInputs.forEach(input => input.addEventListener('change', updateFields));
+  updateFields();
+
+  // basic client-side password match check
+  document.getElementById('registerForm').addEventListener('submit', function (e) {
+    const pwd = this.password.value;
+    const cpwd = this.confirmPassword.value;
+    if (pwd !== cpwd) {
+      e.preventDefault();
+      alert('Password and Confirm Password do not match.');
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseCare HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F1F5F6; --surface: #FFFFFF; --primary: #0D7377; --primary-dark: #0A5A5D;
+    --primary-light: #E0F2F1; --accent: #FF8C61; --text: #1E2A32; --text-muted: #64748B; --border: #E2E8EC;
+  }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; }
+  .navbar-custom { background-color: var(--surface); border-bottom: 1px solid var(--border); }
+  .brand { font-weight: 700; color: var(--primary-dark); letter-spacing: .5px; }
+  .brand .pulse-dot { color: var(--accent); }
+  .btn-brand { background-color: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .btn-brand:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+  .btn-outline-brand { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+  .btn-outline-brand:hover { background-color: var(--primary); color: #fff; }
+  .hero { padding: 80px 0 40px; }
+  .hero h1 { font-size: 2.6rem; line-height: 1.2; }
+  .hero .lead { color: var(--text-muted); font-size: 1.1rem; }
+  .pulse-line { width: 100%; height: 50px; overflow: hidden; margin: 30px 0; }
+  .pulse-line svg path {
+    stroke: var(--accent); stroke-width: 2.5; fill: none;
+    stroke-dasharray: 2400; stroke-dashoffset: 2400;
+    animation: draw 2.8s ease-out forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-line svg path { animation: none; stroke-dashoffset: 0; }
+  }
+  .card-custom {
+    border: none; border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(13,115,119,0.07);
+    background-color: var(--surface);
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card-custom:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(13,115,119,0.12); }
+  .icon-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background-color: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+  }
+  footer { color: var(--text-muted); border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom py-3">
+  <div class="container">
+    <a class="navbar-brand brand" th:href="@{/}"><i class="bi bi-heart-pulse-fill pulse-dot"></i> PulseCare <span class="pulse-dot">HMS</span></a>
+
+    <!-- Logged out -->
+    <div class="d-flex gap-2" sec:authorize="!isAuthenticated()">
+      <a th:href="@{/login}" class="btn btn-outline-brand btn-sm">Sign In</a>
+      <a th:href="@{/register}" class="btn btn-brand btn-sm">Register</a>
+    </div>
+
+    <!-- Logged in -->
+    <div class="d-flex gap-2" sec:authorize="isAuthenticated()">
+      <a sec:authorize="hasRole('PATIENT')" th:href="@{/patient/dashboard}" class="btn btn-brand btn-sm">My Dashboard</a>
+      <a sec:authorize="hasRole('DOCTOR')" th:href="@{/doctor/dashboard}" class="btn btn-brand btn-sm">My Dashboard</a>
+      <a sec:authorize="hasRole('RECEPTIONIST')" th:href="@{/receptionist/dashboard}" class="btn btn-brand btn-sm">My Dashboard</a>
+      <form th:action="@{/logout}" method="post" class="d-inline">
+        <button type="submit" class="btn btn-outline-brand btn-sm">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1>Your hospital's pulse, <span style="color:var(--primary)">digitized</span>.</h1>
+        <p class="lead mt-3">One simple system for patients to book appointments, doctors to track visits and medical notes, and front-desk staff to manage records — all in one place.</p>
+        <div class="d-flex gap-3 mt-4" sec:authorize="!isAuthenticated()">
+          <a th:href="@{/register}" class="btn btn-brand btn-lg px-4">Get Started</a>
+          <a th:href="@{/login}" class="btn btn-outline-brand btn-lg px-4">Sign In</a>
+        </div>
+      </div>
+      <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="pulse-line">
+          <svg viewBox="0 0 1200 50" preserveAspectRatio="none" width="100%" height="50">
+            <path d="M0 25 H150 L170 8 L190 42 L210 25 H350 L370 8 L390 42 L410 25 H550 L570 8 L590 42 L610 25 H750 L770 8 L790 42 L810 25 H950 L970 8 L990 42 L1010 25 H1200"/>
+          </svg>
+        </div>
+        <p class="text-muted text-center">Real-time view of appointments, records and staff — built for small to mid-size clinics and hospitals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2>Built for every role in the clinic</h2>
+      <p class="text-muted">Each person sees only what they need — nothing more, nothing less.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-custom p-4">
+          <div class="icon-circle mb-3"><i class="bi bi-person-fill"></i></div>
+          <h5>Patients</h5>
+          <p class="text-muted mb-0">Register, sign in, and book an appointment with the right doctor — then track its status from a personal dashboard.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-custom p-4">
+          <div class="icon-circle mb-3"><i class="bi bi-clipboard2-pulse-fill"></i></div>
+          <h5>Doctors</h5>
+          <p class="text-muted mb-0">View your appointment schedule, open patient medical details, and keep diagnosis &amp; prescription notes up to date.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-custom p-4">
+          <div class="icon-circle mb-3"><i class="bi bi-person-badge-fill"></i></div>
+          <h5>Receptionists</h5>
+          <p class="text-muted mb-0">Get a front-desk view of every registered patient and doctor, with their contact and appointment details at a glance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center py-4 mt-3">
+  <small>&copy; 2026 PulseCare HMS &middot; Hospital Management System</small>
+</footer>
+
+</body>
+</html>

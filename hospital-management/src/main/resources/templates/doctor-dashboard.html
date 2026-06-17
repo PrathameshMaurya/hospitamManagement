@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard - PulseCare HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F1F5F6; --surface: #FFFFFF; --primary: #0D7377; --primary-dark: #0A5A5D;
+    --primary-light: #E0F2F1; --accent: #FF8C61; --text: #1E2A32; --text-muted: #64748B; --border: #E2E8EC;
+  }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; }
+  .brand { font-weight: 700; color: var(--primary-dark); letter-spacing: .5px; }
+  .brand .pulse-dot { color: var(--accent); }
+  .btn-brand { background-color: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .btn-brand:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+  .btn-outline-brand { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+  .btn-outline-brand:hover { background-color: var(--primary); color: #fff; }
+
+  .topbar { background-color: var(--surface); border-bottom: 1px solid var(--border); }
+  .sidebar { background-color: var(--surface); border-right: 1px solid var(--border); min-height: 100vh; padding: 1.25rem 1rem; }
+  .sidebar .nav-link { color: var(--text-muted); font-weight: 500; border-radius: 8px; padding: .65rem .9rem; margin-bottom: 4px; cursor: pointer; }
+  .sidebar .nav-link i { margin-right: 10px; width: 18px; text-align: center; }
+  .sidebar .nav-link.active, .sidebar .nav-link:hover { background-color: var(--primary-light); color: var(--primary-dark); }
+  .sidebar form button.nav-link { border: none; background: none; width: 100%; text-align: left; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card-custom { border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(13,115,119,0.07); background-color: var(--surface); }
+  .stat-icon { width: 46px; height: 46px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+  .stat-value { font-family:'Poppins',sans-serif; font-weight:700; font-size:1.6rem; }
+
+  .form-label { font-weight: 500; font-size: .9rem; }
+  .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 .2rem rgba(13,115,119,0.15); }
+
+  .badge-pill { font-weight: 600; font-size: .75rem; padding: .35em .75em; border-radius: 50px; }
+  .badge-pending { background-color: #FFF3E0; color: #ED6C02; }
+  .badge-confirmed { background-color: #E8F5E9; color: #2E7D32; }
+  .badge-completed { background-color: #E3F2FD; color: #1565C0; }
+  .badge-cancelled { background-color: #FDECEA; color: #D32F2F; }
+
+  .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary-dark); display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Poppins',sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div class="sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="sidebar" style="width: 240px;">
+    <a th:href="@{/}" class="brand text-decoration-none d-block mb-4 fs-5"><i class="bi bi-heart-pulse-fill pulse-dot"></i> PulseCare <span class="pulse-dot">HMS</span></a>
+    <nav class="nav flex-column">
+      <a class="nav-link active" data-section="overview"><i class="bi bi-grid-1x2-fill"></i>Overview</a>
+      <a class="nav-link" data-section="appointments"><i class="bi bi-calendar2-week-fill"></i>Appointments</a>
+      <a class="nav-link" data-section="records"><i class="bi bi-file-earmark-medical-fill"></i>Medical Records</a>
+      <a class="nav-link" data-section="profile"><i class="bi bi-person-circle"></i>My Profile</a>
+    </nav>
+    <hr>
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i>Logout</button>
+    </form>
+  </div>
+
+  <!-- Main -->
+  <div class="flex-grow-1">
+    <!-- Topbar -->
+    <div class="topbar d-flex align-items-center justify-content-between px-3 px-md-4 py-3">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-brand btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <h5 class="mb-0 d-none d-sm-block">Doctor Dashboard</h5>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="d-none d-sm-inline text-muted small" th:text="${doctor.user.fullName}">Doctor</span>
+        <div class="avatar-circle" th:text="${#strings.toUpperCase(#strings.substring(doctor.user.fullName,0,1))}">D</div>
+      </div>
+    </div>
+
+    <div class="p-3 p-md-4">
+
+      <!-- Flash message -->
+      <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+      <!-- OVERVIEW -->
+      <div class="section active" id="overview">
+        <h4 class="mb-1">
+          Welcome back, <span th:text="${doctor.user.fullName}">Doctor</span> 👋
+        </h4>
+        <p class="text-muted" th:text="${(doctor.specialization != null ? doctor.specialization : 'General')} + ' · here is your overview.'">Overview</p>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-4">
+            <div class="card-custom p-3 d-flex flex-row align-items-center gap-3">
+              <div class="stat-icon"><i class="bi bi-calendar-check-fill"></i></div>
+              <div>
+                <div class="stat-value" th:text="${#lists.size(appointments)}">0</div>
+                <div class="text-muted small">Total Appointments</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-custom p-3 d-flex flex-row align-items-center gap-3">
+              <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+              <div>
+                <div class="stat-value" th:text="${#lists.size(patients)}">0</div>
+                <div class="text-muted small">Registered Patients</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-custom p-3 d-flex flex-row align-items-center gap-3">
+              <div class="stat-icon"><i class="bi bi-file-earmark-medical"></i></div>
+              <div>
+                <div class="stat-value" th:text="${#lists.size(records)}">0</div>
+                <div class="text-muted small">Medical Records Added</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-custom p-4 mt-4">
+          <h6 class="mb-3">Recent appointments</h6>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr class="text-muted small">
+                  <th>Date &amp; Time</th>
+                  <th>Patient</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                  <td colspan="4" class="text-center text-muted py-4">No appointments yet.</td>
+                </tr>
+                <tr th:each="appt, apptStat : ${appointments}" th:if="${apptStat.index < 5}">
+                  <td th:text="${#temporals.format(appt.appointmentDate, 'dd MMM yyyy') + ', ' + #temporals.format(appt.appointmentTime, 'hh:mm a')}"></td>
+                  <td th:text="${appt.patient.user.fullName}"></td>
+                  <td th:text="${appt.reason}"></td>
+                  <td><span class="badge-pill" th:classappend="${appt.statusBadgeClass}" th:text="${appt.status}"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENTS -->
+      <div class="section" id="appointments">
+        <h4 class="mb-1">Appointments</h4>
+        <p class="text-muted">All appointments booked with you, across all dates.</p>
+
+        <div class="card-custom p-3 mt-3">
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr class="text-muted small">
+                  <th>Date &amp; Time</th>
+                  <th>Patient</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                  <td colspan="5" class="text-center text-muted py-4">No appointments yet.</td>
+                </tr>
+                <tr th:each="appt : ${appointments}">
+                  <td th:text="${#temporals.format(appt.appointmentDate, 'dd MMM yyyy') + ', ' + #temporals.format(appt.appointmentTime, 'hh:mm a')}"></td>
+                  <td th:text="${appt.patient.user.fullName}"></td>
+                  <td th:text="${appt.reason}"></td>
+                  <td><span class="badge-pill" th:classappend="${appt.statusBadgeClass}" th:text="${appt.status}"></span></td>
+                  <td><button class="btn btn-outline-brand btn-sm" onclick="showSection('records')">View Record</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDICAL RECORDS -->
+      <div class="section" id="records">
+        <h4 class="mb-1">Patient Medical Records</h4>
+        <p class="text-muted">Add diagnosis, prescription and notes for a patient's visit.</p>
+
+        <div class="card-custom p-4 mt-3">
+          <form th:action="@{/doctor/medical-records/save}" method="post">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Patient</label>
+                <select class="form-select" name="patientId" required>
+                  <option value="">Select patient</option>
+                  <option th:each="p : ${patients}" th:value="${p.id}" th:text="${p.user.fullName}"></option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Visit Date</label>
+                <input type="date" class="form-control" name="visitDate" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Diagnosis</label>
+                <textarea class="form-control" name="diagnosis" rows="2" placeholder="e.g. Mild hypertension"></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Prescription</label>
+                <textarea class="form-control" name="prescription" rows="2" placeholder="Medicines, dosage and duration"></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Doctor's Notes</label>
+                <textarea class="form-control" name="notes" rows="2" placeholder="Any additional notes or follow-up advice"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-brand px-4 mt-4">Save Record</button>
+          </form>
+        </div>
+
+        <div class="card-custom p-3 mt-3">
+          <h6 class="mb-3 px-2 pt-1">Recent Records</h6>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr class="text-muted small">
+                  <th>Date</th>
+                  <th>Patient</th>
+                  <th>Diagnosis</th>
+                  <th>Prescription</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(records)}">
+                  <td colspan="4" class="text-center text-muted py-4">No medical records added yet.</td>
+                </tr>
+                <tr th:each="rec : ${records}">
+                  <td th:text="${#temporals.format(rec.visitDate, 'dd MMM yyyy')}"></td>
+                  <td th:text="${rec.patient.user.fullName}"></td>
+                  <td th:text="${rec.diagnosis}"></td>
+                  <td th:text="${rec.prescription}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="section" id="profile">
+        <h4 class="mb-1">My Profile</h4>
+        <p class="text-muted">Your professional details, visible to patients and staff.</p>
+
+        <div class="card-custom p-4 mt-3">
+          <form th:action="@{/doctor/profile/update}" method="post">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="fullName" th:value="${doctor.user.fullName}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" th:value="${doctor.user.email}" readonly>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" name="phone" th:value="${doctor.user.phone}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Specialization</label>
+                <select class="form-select" name="specialization">
+                  <option value="">Select</option>
+                  <option th:selected="${doctor.specialization == 'General Medicine'}">General Medicine</option>
+                  <option th:selected="${doctor.specialization == 'Cardiology'}">Cardiology</option>
+                  <option th:selected="${doctor.specialization == 'Dermatology'}">Dermatology</option>
+                  <option th:selected="${doctor.specialization == 'Pediatrics'}">Pediatrics</option>
+                  <option th:selected="${doctor.specialization == 'Orthopedics'}">Orthopedics</option>
+                  <option th:selected="${doctor.specialization == 'ENT'}">ENT</option>
+                  <option th:selected="${doctor.specialization == 'Neurology'}">Neurology</option>
+                  <option th:selected="${doctor.specialization == 'Gynecology'}">Gynecology</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Qualification</label>
+                <input type="text" class="form-control" name="qualification" th:value="${doctor.qualification}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Experience (years)</label>
+                <input type="number" class="form-control" name="experience" th:value="${doctor.experience}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">License / Registration No.</label>
+                <input type="text" class="form-control" name="licenseNumber" th:value="${doctor.licenseNumber}">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-brand px-4 mt-4">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(l => l.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelector('.sidebar .nav-link[data-section="' + id + '"]').classList.add('active');
+
+    const offcanvasEl = document.getElementById('sidebar');
+    const oc = bootstrap.Offcanvas.getInstance(offcanvasEl);
+    if (oc) oc.hide();
+  }
+
+  document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(link => {
+    link.addEventListener('click', () => showSection(link.dataset.section));
+  });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

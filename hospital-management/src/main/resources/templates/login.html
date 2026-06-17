@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In - PulseCare HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F1F5F6; --surface: #FFFFFF; --primary: #0D7377; --primary-dark: #0A5A5D;
+    --primary-light: #E0F2F1; --accent: #FF8C61; --text: #1E2A32; --text-muted: #64748B; --border: #E2E8EC;
+  }
+  body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Poppins', sans-serif; }
+  .navbar-custom { background-color: var(--surface); border-bottom: 1px solid var(--border); }
+  .brand { font-weight: 700; color: var(--primary-dark); letter-spacing: .5px; }
+  .brand .pulse-dot { color: var(--accent); }
+  .btn-brand { background-color: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .btn-brand:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+  .btn-outline-brand { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+  .btn-outline-brand:hover { background-color: var(--primary); color: #fff; }
+  .auth-wrap { padding: 70px 0; }
+  .card-custom { border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(13,115,119,0.07); background-color: var(--surface); }
+  .form-label { font-weight: 500; font-size: .9rem; }
+  .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 .2rem rgba(13,115,119,0.15); }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom py-3">
+  <div class="container">
+    <a class="navbar-brand brand" th:href="@{/}"><i class="bi bi-heart-pulse-fill pulse-dot"></i> PulseCare <span class="pulse-dot">HMS</span></a>
+    <div class="d-flex gap-2">
+      <a th:href="@{/register}" class="btn btn-brand btn-sm">Register</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container auth-wrap">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-xl-4">
+      <div class="card-custom p-4 p-md-5">
+        <div class="text-center mb-4">
+          <h3>Welcome back</h3>
+          <p class="text-muted mb-0">Sign in to continue to your dashboard.</p>
+        </div>
+
+        <!-- Status / flash messages -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${param.error}" class="alert alert-danger">Invalid email or password.</div>
+        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
+
+        <form th:action="@{/login}" method="post" id="loginForm">
+
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" name="email" placeholder="Enter your mail" required autofocus>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Enter your password" required>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember" name="remember-me">
+              <label class="form-check-label small text-muted" for="remember">Remember me</label>
+            </div>
+            <a href="#" class="small text-decoration-none" style="color:var(--primary);">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-brand w-100 py-2">Sign In</button>
+        </form>
+
+        <p class="text-center text-muted mt-4 mb-0">
+          New here? <a th:href="@{/register}" class="text-decoration-none" style="color:var(--primary); font-weight:600;">Create an account</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
